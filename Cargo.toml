@@ -6,7 +6,7 @@ authors = ["Ken <kenakioreed@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/tiby312/glem"
 description = "Linear algebra transformation adaptors"
-keywords = ["matrix", "linear algebra","adaptors","graphics","3d"]
+keywords = ["matrix", "transform","adaptors","graphics","3d"]
 readme = "README.md"
 include = ["src/**/*", "LICENSE-MIT", "README.md"]
 
