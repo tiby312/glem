@@ -20,9 +20,11 @@ fn example() {
 
     assert_eq!(c,x*y);
 }
+```
 
+### Inverse Example
 
-
+```rust
 #[test]
 fn inverse_example() {
     let c = glem::combine!(
