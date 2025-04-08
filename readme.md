@@ -1,7 +1,7 @@
 
-Perform linear algebra by chaining adaptors! Derive the inverse function for a chain of adaptors, without having to compute the matrix inverse!
+Perform linear algebra by chaining adaptors. Derive the inverse function for a chain of adaptors, without having to compute the matrix inverse.
 
-Instead of passing around rotation or translation matrices, just pass around the information to build these matrices in an adaptor. Then only when build() is called actually build the matrix. This likely avoid a lot of temporary matrices.
+Instead of passing around rotation or translation matrices, just pass around the information to build these matrices. Then only when build() is called actually build the matrix. This likely avoids a lot of temporary matrices being created and destroyed when performming long sequences of linear algebra operations.
 
 
 ### Example
