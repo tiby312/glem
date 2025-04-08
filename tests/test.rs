@@ -6,13 +6,11 @@ fn example() {
 
     let c = glem::build(&c);
 
-    let x=glem::build(&glem::rotate_x(0.5));
-    let y=glem::build(&glem::translate(55.0, -5.0, -6.0));
+    let x = glem::build(&glem::rotate_x(0.5));
+    let y = glem::build(&glem::translate(55.0, -5.0, -6.0));
 
-    assert_eq!(c,x*y);
+    assert_eq!(c, x * y);
 }
-
-
 
 #[test]
 fn inverse_example() {

@@ -26,7 +26,7 @@ pub trait Inverse: Mat {
 
 impl Mat for Mat4 {
     fn generate(&self) -> Mat4 {
-        self.clone()
+        *self
     }
 }
 
@@ -38,8 +38,8 @@ impl Inverse for Mat4 {
 }
 pub trait Mat {
     fn generate(&self) -> Mat4;
-    fn apply(&self, foo: &mut Mat4) {
-        *foo *= self.generate();
+    fn apply(&self, m: &mut Mat4) {
+        *m *= self.generate();
     }
     fn chain<K: Mat>(self, other: K) -> Chain<Self, K>
     where
@@ -68,9 +68,9 @@ impl<A: Inverse, B: Inverse> Inverse for Chain<A, B> {
     }
 }
 impl<A: Mat, B: Mat> Mat for Chain<A, B> {
-    fn apply(&self, foo: &mut Mat4) {
-        self.a.apply(foo);
-        self.b.apply(foo);
+    fn apply(&self, m: &mut Mat4) {
+        self.a.apply(m);
+        self.b.apply(m);
     }
     fn generate(&self) -> Mat4 {
         let a = self.a.generate();
