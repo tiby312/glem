@@ -1,7 +1,7 @@
 
-Using matrices from the `glam` crate, perform linear algebra by chaining adaptors. Derive the inverse function for a chain of adaptors, without having to compute the matrix inverse.
+Using matrices from the `glam` crate, perform linear algebra transforms by chaining adaptors. Derive the inverse function for a chain of adaptors, without having to compute the matrix inverse.
 
-Instead of passing around rotation or translation matrices, just pass around the information to build these matrices. Then only when `glem::build()` is called actually build the matrix. This likely avoids a lot of temporary matrices being created and destroyed when performming long sequences of linear algebra operations.
+Instead of passing around rotation or translation transformation matrices, just pass around the information to build these matrices. Then only when `glem::build()` is called actually build the matrix. This likely avoids a lot of temporary matrices being created and destroyed when executing long sequences of transformations.
 
 You can find `glem` on [github](https://github.com/tiby312/glem.git) and [crates.io](https://crates.io/crates/glem). Documentation at [docs.rs](https://docs.rs/glem)
 
