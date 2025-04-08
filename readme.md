@@ -38,8 +38,6 @@ fn approx_eq(a: &glam::f32::Mat4, b: &glam::f32::Mat4) {
         assert!((a - b).abs() < 0.000001, "{}:{}", a, b);
     }
 }
-
-
 ```
 
 
