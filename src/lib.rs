@@ -17,47 +17,36 @@ pub fn build(a: impl Mat) -> Mat4 {
 }
 
 pub trait Inverse: Mat {
-    type Neg: Mat;
-    fn generate_inverse(&self) -> Self::Neg;
-    fn apply_inverse(&self, a: &mut Mat4) {
-        *a *= self.generate_inverse().generate();
-    }
+    fn apply_inverse(&self, a: &mut Mat4);
 }
 
 impl<T: Inverse> Inverse for &T {
-    type Neg = T::Neg;
-    fn generate_inverse(&self) -> Self::Neg {
-        (**self).generate_inverse()
+    fn apply_inverse(&self, m: &mut Mat4) {
+        (**self).apply_inverse(m)
     }
 }
 
 impl Mat for Mat4 {
-    fn generate(&self) -> Mat4 {
-        *self
+    fn apply(&self, m: &mut Mat4) {
+        *m *= *self;
     }
 }
 
 impl Inverse for Mat4 {
-    type Neg = Self;
-    fn generate_inverse(&self) -> Self::Neg {
-        self.inverse()
+    fn apply_inverse(&self, a: &mut Mat4) {
+        *a *= self.inverse()
     }
 }
 
 impl<T: Mat> Mat for &T {
-    fn generate(&self) -> Mat4 {
-        (**self).generate()
-    }
     fn apply(&self, m: &mut Mat4) {
         (**self).apply(m)
     }
 }
 
 pub trait Mat {
-    fn generate(&self) -> Mat4;
-    fn apply(&self, m: &mut Mat4) {
-        *m *= self.generate();
-    }
+    fn apply(&self, m: &mut Mat4);
+
     fn chain<K: Mat>(self, other: K) -> Chain<Self, K>
     where
         Self: Sized,
@@ -72,13 +61,6 @@ pub struct Chain<A, B> {
     b: B,
 }
 impl<A: Inverse, B: Inverse> Inverse for Chain<A, B> {
-    type Neg = Chain<B::Neg, A::Neg>;
-    fn generate_inverse(&self) -> Self::Neg {
-        Chain {
-            a: self.b.generate_inverse(),
-            b: self.a.generate_inverse(),
-        }
-    }
     fn apply_inverse(&self, a: &mut Mat4) {
         self.b.apply_inverse(a);
         self.a.apply_inverse(a);
@@ -88,11 +70,6 @@ impl<A: Mat, B: Mat> Mat for Chain<A, B> {
     fn apply(&self, m: &mut Mat4) {
         self.a.apply(m);
         self.b.apply(m);
-    }
-    fn generate(&self) -> Mat4 {
-        let a = self.a.generate();
-        let b = self.b.generate();
-        a * b
     }
 }
 
@@ -104,18 +81,13 @@ pub struct Scale {
 }
 
 impl Inverse for Scale {
-    type Neg = Self;
-    fn generate_inverse(&self) -> Self::Neg {
-        Scale {
-            tx: 1.0 / self.tx,
-            ty: 1.0 / self.ty,
-            tz: 1.0 / self.tz,
-        }
+    fn apply_inverse(&self, m: &mut Mat4) {
+        scale(1.0 / self.tx, 1.0 / self.ty, 1.0 / self.tz).apply(m)
     }
 }
 impl Mat for Scale {
-    fn generate(&self) -> Mat4 {
-        Mat4::from_cols_array(&[
+    fn apply(&self, m: &mut Mat4) {
+        *m *= Mat4::from_cols_array(&[
             self.tx, 0., 0., 0., 0., self.ty, 0., 0., 0., 0., self.tz, 0., 0., 0., 0., 1.0,
         ])
     }
@@ -126,19 +98,16 @@ pub struct XRot {
     pub angle_rad: f32,
 }
 impl Inverse for XRot {
-    type Neg = Self;
-    fn generate_inverse(&self) -> Self::Neg {
-        XRot {
-            angle_rad: -self.angle_rad,
-        }
+    fn apply_inverse(&self, m: &mut Mat4) {
+        rotate_x(-self.angle_rad).apply(m)
     }
 }
 impl Mat for XRot {
-    fn generate(&self) -> Mat4 {
+    fn apply(&self, m: &mut Mat4) {
         let c = self.angle_rad.cos();
         let s = self.angle_rad.sin();
 
-        Mat4::from_cols_array(&[1., 0., 0., 0., 0., c, s, 0., 0., -s, c, 0., 0., 0., 0., 1.])
+        *m *= Mat4::from_cols_array(&[1., 0., 0., 0., 0., c, s, 0., 0., -s, c, 0., 0., 0., 0., 1.])
     }
 }
 
@@ -147,19 +116,16 @@ pub struct YRot {
     pub angle_rad: f32,
 }
 impl Inverse for YRot {
-    type Neg = Self;
-    fn generate_inverse(&self) -> Self::Neg {
-        YRot {
-            angle_rad: -self.angle_rad,
-        }
+    fn apply_inverse(&self, m: &mut Mat4) {
+        rotate_y(-self.angle_rad).apply(m)
     }
 }
 impl Mat for YRot {
-    fn generate(&self) -> Mat4 {
+    fn apply(&self, m: &mut Mat4) {
         let c = self.angle_rad.cos();
         let s = self.angle_rad.sin();
 
-        Mat4::from_cols_array(&[c, 0., -s, 0., 0., 1., 0., 0., s, 0., c, 0., 0., 0., 0., 1.])
+        *m *= Mat4::from_cols_array(&[c, 0., -s, 0., 0., 1., 0., 0., s, 0., c, 0., 0., 0., 0., 1.])
     }
 }
 
@@ -168,19 +134,16 @@ pub struct ZRot {
     pub angle_rad: f32,
 }
 impl Inverse for ZRot {
-    type Neg = Self;
-    fn generate_inverse(&self) -> Self::Neg {
-        ZRot {
-            angle_rad: -self.angle_rad,
-        }
+    fn apply_inverse(&self, m: &mut Mat4) {
+        rotate_z(-self.angle_rad).apply(m)
     }
 }
 impl Mat for ZRot {
-    fn generate(&self) -> Mat4 {
+    fn apply(&self, m: &mut Mat4) {
         let c = self.angle_rad.cos();
         let s = self.angle_rad.sin();
 
-        Mat4::from_cols_array(&[c, s, 0., 0., -s, c, 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.])
+        *m *= Mat4::from_cols_array(&[c, s, 0., 0., -s, c, 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.])
     }
 }
 
@@ -213,21 +176,16 @@ pub struct Translation {
 }
 
 impl Inverse for Translation {
-    type Neg = Self;
-    fn generate_inverse(&self) -> Self::Neg {
-        Translation {
-            tx: -self.tx,
-            ty: -self.ty,
-            tz: -self.tz,
-        }
+    fn apply_inverse(&self, m: &mut Mat4) {
+        translate(-self.tx, -self.ty, -self.tz).apply(m)
     }
 }
 impl Mat for Translation {
-    fn generate(&self) -> Mat4 {
+    fn apply(&self, m: &mut Mat4) {
         let tx = self.tx;
         let ty = self.ty;
         let tz = self.tz;
-        Mat4::from_cols_array(&[
+        *m *= Mat4::from_cols_array(&[
             1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., tx, ty, tz, 1.,
         ])
     }
