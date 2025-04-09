@@ -14,13 +14,14 @@ fn example() {
 
     let c = glem::rotate_x(0.5).chain(glem::translate(55.0, -5.0, -6.0));
 
-    let c = glem::build(&c);
+    let c = glem::build(c);
 
-    let x=glem::build(&glem::rotate_x(0.5));
-    let y=glem::build(&glem::translate(55.0, -5.0, -6.0));
+    let x = glem::build(glem::rotate_x(0.5));
+    let y = glem::build(glem::translate(55.0, -5.0, -6.0));
 
-    assert_eq!(c,x*y);
+    assert_eq!(c, x * y);
 }
+
 ```
 
 ### Inverse Example
@@ -44,9 +45,9 @@ fn inverse_example() {
         glem::rotate_x(-0.5)
     );
 
-    assert_eq!(glem::build_inverse(&c), glem::build(&c2));
+    assert_eq!(glem::build_inverse(&c), glem::build(c2));
 
-    approx_eq(&glem::build(&c).inverse(), &glem::build_inverse(&c));
+    approx_eq(&glem::build(&c).inverse(), &glem::build_inverse(c));
 }
 
 fn approx_eq(a: &glam::f32::Mat4, b: &glam::f32::Mat4) {
@@ -57,7 +58,6 @@ fn approx_eq(a: &glam::f32::Mat4, b: &glam::f32::Mat4) {
         assert!((a - b).abs() < 0.000001, "{}:{}", a, b);
     }
 }
-
 ```
 
 

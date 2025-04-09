@@ -4,13 +4,13 @@ pub mod prelude {
     pub use super::Mat;
 }
 
-pub fn build_inverse(a: &impl Inverse) -> Mat4 {
+pub fn build_inverse(a: impl Inverse) -> Mat4 {
     let mut m = Mat4::IDENTITY;
     a.apply_inverse(&mut m);
     m
 }
 
-pub fn build(a: &impl Mat) -> Mat4 {
+pub fn build(a: impl Mat) -> Mat4 {
     let mut m = Mat4::IDENTITY;
     a.apply(&mut m);
     m
@@ -21,6 +21,13 @@ pub trait Inverse: Mat {
     fn generate_inverse(&self) -> Self::Neg;
     fn apply_inverse(&self, a: &mut Mat4) {
         *a *= self.generate_inverse().generate();
+    }
+}
+
+impl<T: Inverse> Inverse for &T {
+    type Neg = T::Neg;
+    fn generate_inverse(&self) -> Self::Neg {
+        (**self).generate_inverse()
     }
 }
 
@@ -36,6 +43,16 @@ impl Inverse for Mat4 {
         self.inverse()
     }
 }
+
+impl<T: Mat> Mat for &T {
+    fn generate(&self) -> Mat4 {
+        (**self).generate()
+    }
+    fn apply(&self, m: &mut Mat4) {
+        (**self).apply(m)
+    }
+}
+
 pub trait Mat {
     fn generate(&self) -> Mat4;
     fn apply(&self, m: &mut Mat4) {
@@ -188,7 +205,7 @@ pub fn translate(tx: f32, ty: f32, tz: f32) -> Translation {
     Translation { tx, ty, tz }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Translation {
     tx: f32,
     ty: f32,
