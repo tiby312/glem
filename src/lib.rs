@@ -1,5 +1,6 @@
 use glam::f32::Mat4;
 
+
 pub mod prelude {
     pub use super::Mat;
 }
@@ -191,9 +192,7 @@ impl Mat for Translation {
     }
 }
 
-///
-/// Chain together a list of elements
-///
+
 #[macro_export]
 macro_rules! combine {
     ($a:expr)=>{
